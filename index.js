@@ -8,6 +8,7 @@ const bcrypt = require('bcryptjs');
 const User = require('./models/user.model');
 const cors = require('cors');
 const {getMessages, sendMessage, markMessagesAsRead, deleteMessage} = require("./crud");
+const { timeStamp } = require("console");
 
 
 // Instances
@@ -192,8 +193,8 @@ io.on('connect',(socket) => {
     // // Emit the message to the sender (optional)
     // socket.emit('message', { sender: employeeId, text: message, receiver: receiverEmployeeId });
 
-    io.to(sender.id).emit('message', { sender: employeeId, text: message, receiver: receiverEmployeeId });
-    io.to(receiver.id).emit('message', { sender: employeeId, text: message, receiver: receiverEmployeeId });
+    // io.to(sender.id).emit('message', { sender: employeeId, text: message, receiver: receiverEmployeeId });
+    io.to(receiver.id).emit('message', { sender: employeeId, text: message, receiver: receiverEmployeeId, timestamp: Date.now() });
 
     // Call the callback to acknowledge the message sent
     callback();
