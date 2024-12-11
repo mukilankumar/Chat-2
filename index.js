@@ -193,7 +193,7 @@ io.on('connect',(socket) => {
     // // Emit the message to the sender (optional)
     // socket.emit('message', { sender: employeeId, text: message, receiver: receiverEmployeeId });
 
-    io.to(sender.id).emit('message', { sender: employeeId, text: message, receiver: receiverEmployeeId, timestamp: Date.now() });
+    // io.to(sender.id).emit('message', { sender: employeeId, text: message, receiver: receiverEmployeeId, timestamp: Date.now() });
     io.to(receiver.id).emit('message', { sender: employeeId, text: message, receiver: receiverEmployeeId, timestamp: Date.now() });
 
     // Call the callback to acknowledge the message sent
