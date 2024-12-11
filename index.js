@@ -174,7 +174,9 @@ io.on('connect',(socket) => {
   socket.on('sendMessage', (employeeId, message, receiverEmployeeId, callback) => {
     
     // Get the sender's user data
-    sendMessage(employeeId, receiverEmployeeId, message);
+    const store = sendMessage(employeeId, receiverEmployeeId, message);
+    console.log(store);
+    
     const sender = getUserByEmployeeId(employeeId); // Find sender by their socket ID (employeeId is now the socket ID)
     
     if (!sender) {

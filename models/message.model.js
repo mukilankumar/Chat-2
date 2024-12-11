@@ -28,8 +28,8 @@ const messageSchema = new mongoose.Schema({
     }
 });
 
-messageSchema.index({ sender: 1, receiver: 1, timestamp: 1 }); // Compound index for fast retrieval based on sender, receiver, and timestamp.
-messageSchema.index({ conversationId: 1, timestamp: 1 }); // Compound index for querying all messages in a conversation ordered by timestamp.
+messageSchema.index({ sender: 1, receiver: 1, timestamp: 0 }); // Compound index for fast retrieval based on sender, receiver, and timestamp.
+messageSchema.index({ conversationId: 1, timestamp: 0 }); // Compound index for querying all messages in a conversation ordered by timestamp.
 
 
 // Create a model based on the schema

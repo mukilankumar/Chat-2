@@ -24,7 +24,7 @@ const getMessages = async (sender, receiver, limit = 20) => {
 
   const messages = await Message.find({ conversationId })
     .sort({ timestamp: 1 })  // Sorting messages by timestamp (ascending)
-    .limit(limit);  // Limit the number of messages (pagination)
+      // Limit the number of messages (pagination)
 
   return messages;
 };
