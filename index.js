@@ -2,12 +2,12 @@
 const express = require("express");
 const socketio = require("socket.io");
 const http = require("http");
-const { addUser, removeUser, getUser, getUserByEmployeeId,getUserBySocketId, getRoomUsers } = require("./entity");
+const { addUser, removeUser, getUser, getUserByEmployeeId,getUserBySocketId, getRoomUsers, addGroup } = require("./entity");
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const User = require('./models/user.model');
 const cors = require('cors');
-const {getMessages, sendMessage, markMessagesAsRead, deleteMessage} = require("./crud");
+const {getMessages, sendMessage, markMessagesAsRead, deleteMessage, sendGroupMessage, getGroupMessages} = require("./crud");
 const { timeStamp } = require("console");
 
 
@@ -104,6 +104,17 @@ app.get('/getMessages', async (req, res) => {
   }
 });
 
+app.get('/getGroupMessages', async (req, res) => {
+  const { group } = req.query;
+
+  try {
+    const messages = await getGroupMessages(group);
+    res.status(200).send({ messages });
+  } catch (err) {
+    res.status(500).send({ error: 'Error retrieving messages' });
+  }
+});
+
 // Mark messages as read
 app.post('/markAsRead', async (req, res) => {
   const { sender, receiver } = req.body;
@@ -170,6 +181,23 @@ io.on('connect',(socket) => {
       socket.emit('roomMembers', getRoomUsers(response))
   })
 
+  socket.on('joinGroup',({user,room},callback) => {
+    console.log(user,room)
+      const {response , error} = addGroup({id: socket.id , user:user, room: room})
+
+      console.log(response) 
+
+      if(error) {
+        callback(error)
+        return;
+      }
+      socket.join(response.room);
+      // socket.emit('message', { user: 'admin' , text: `Welcome ${response.user} ` });
+      // socket.broadcast.to(response.room).emit('message', { user: 'admin', text : `${response.user} has joined` })
+
+      io.to(response.room).emit('roomMembers', getRoomUsers(response.room))
+  })
+
 
   socket.on('sendMessage', (employeeId, message, receiverEmployeeId, callback) => {
     
@@ -202,6 +230,17 @@ io.on('connect',(socket) => {
     callback();
 });
 
+socket.on('sendGroupMessage',(message,callback) => {
+    
+  const user = getUser(socket.id)
+
+  sendGroupMessage(user.room, user.user, message);
+
+  io.to(user.room).emit('message',{ sender: user.user, text : message, timestamp: Date.now() })
+
+  callback()
+})
+
  
 
   socket.on('disconnect',() => {
@@ -211,7 +250,7 @@ io.on('connect',(socket) => {
 
     if(user) {
       socket.emit('roomMembers', getRoomUsers());
-      io.to(user.room).emit('message',{ user: 'admin', text : `${user.user} has left` })
+      // io.to(user.room).emit('message',{ user: 'admin', text : `${user.user} has left` })
     }
   })
 

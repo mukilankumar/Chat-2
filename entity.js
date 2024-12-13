@@ -14,6 +14,32 @@ const addUser = ({ id, employeeId, user }) => {
     return { response: newUser };
 };
 
+const addGroup = ({ id, user, room }) => {
+    
+    user = user.trim();
+    room = room.trim().toLowerCase();
+
+    if (!user || !room) {
+        return { error: 'name and room required' }
+    }
+
+    if (users.length) {
+        const data = users.find(e => e.user === user && e.room === room)
+
+        if (data) {
+            return { error: 'user already exist' }
+        }
+    }
+
+    const response = { id, user, room }
+
+    users.push(response)
+
+    console.log(users)
+
+    return { response };
+}
+
 const getUser = (id) => {
     return users.find(e => e.id == id);
 }
@@ -41,6 +67,7 @@ const removeUser = (id) => {
 }
 module.exports = {
     addUser,
+    addGroup,
     getUser,
     removeUser,
     getRoomUsers,
