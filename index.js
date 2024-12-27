@@ -241,6 +241,37 @@ socket.on('sendGroupMessage',(message,callback) => {
   callback()
 })
 
+socket.on(
+  "initiateCall",
+  ({ targetId, signalData, senderId, senderName }) => {
+    io.to(targetId).emit("incomingCall", {
+      signal: signalData,
+      from: senderId,
+      name: senderName,
+    });
+  }
+);
+
+socket.on("changeMediaStatus", ({ mediaType, isActive }) => {
+  socket.broadcast.emit("mediaStatusChanged", {
+    mediaType,
+    isActive,
+  });
+});
+
+
+socket.on("answerCall", (data) => {
+  socket.broadcast.emit("mediaStatusChanged", {
+    mediaType: data.mediaType,
+    isActive: data.mediaStatus,
+  });
+  io.to(data.to).emit("callAnswered", data);
+});
+
+socket.on("terminateCall", ({ targetId }) => {
+  io.to(targetId).emit("callTerminated");
+});
+
  
 
   socket.on('disconnect',() => {
